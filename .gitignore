@@ -1,5 +1,6 @@
 # Directory to store examples for development and testing
 examples/
+*.tar.gz
 # Directory to store XML files after uncompression and before deletion
 course/
 # IDE
