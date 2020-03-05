@@ -1,89 +1,76 @@
 package parser
 
 import (
-	"encoding/json"
-	"errors"
-	"os"
-
-	xj "github.com/basgys/goxml2json"
+	"encoding/xml"
+	"fmt"
+	"io/ioutil"
 )
 
-// ParseCourse into Course object
+// CoursePath is a path to folder with course structure in XML format
+const CoursePath string = "course/"
+
+// ParseCourse parses course structure recursively from root to leaves
 func ParseCourse() (Course, error) {
 	course, err := parseCourseRoot()
 	return course, err
 }
 
+// CourseXML is a description of CoursePath + "/course/course.xml" XML file
+type CourseXML struct {
+	DisplayName string       `xml:"display_name,attr"`
+	Chapters    []ChapterXML `xml:"chapter"`
+}
+
+// ChapterXML is a description of CoursePath + "/chapter/" + ChapterID + ".xml" XML file
+type ChapterXML struct {
+	URLName     string          `xml:"url_name,attr"`
+	DisplayName string          `xml:"display_name,attr"`
+	Sequentials []SequentialXML `xml:"sequential"`
+}
+
+// SequentialXML is a description of CoursePath + "/sequential/" + SequentialID + ".xml" XML file
+type SequentialXML struct {
+	URLName string `xml:"url_name,attr"`
+	// TODO: add CoursePath + "/sequential/" + SequentialID + ".xml" file structure
+}
+
 func parseCourseRoot() (Course, error) {
-	courseRootXMLReader, err := os.Open("course/course/course.xml")
-	if err != nil {
-		return Course{}, err
-	}
-	courseRootJSONBytes, err := xj.Convert(courseRootXMLReader)
+	courseRootXMLReader, err := ioutil.ReadFile(CoursePath + "/course/course.xml")
 	if err != nil {
 		return Course{}, err
 	}
 
-	var courseRootJSON interface{}
-	err = json.Unmarshal(courseRootJSONBytes.Bytes(), &courseRootJSON)
+	courseXML := CourseXML{}
+	err = xml.Unmarshal(courseRootXMLReader, &courseXML)
 	if err != nil {
 		return Course{}, err
 	}
 
-	courseRootJSONMap, ok := courseRootJSON.(map[string]interface{})
-	if !ok {
-		return Course{}, errors.New("Couldn't convert JSON bytes to map")
-	}
-	courseInformation, ok := courseRootJSONMap["course"]
-	if !ok {
-		return Course{}, errors.New("Course is not in JSON")
+	for _, chapter := range courseXML.Chapters {
+		parseChapter(chapter.URLName)
 	}
 
-	courseInformationMap, ok := courseInformation.(map[string]interface{})
-	if !ok {
-		return Course{}, errors.New("Couldn't conevrt JSON to map")
+	return Course{}, nil
+}
+
+func parseChapter(chapterURL string) (Chapter, error) {
+	chapterXMLReader, err := ioutil.ReadFile(CoursePath + "/chapter/" + chapterURL + ".xml")
+	if err != nil {
+		return Chapter{}, err
 	}
 
-	courseDisplayName, ok := courseInformationMap["-display_name"]
-	if !ok {
-		return Course{}, errors.New("Couldn't get display name of the course")
+	chapterXML := ChapterXML{}
+	err = xml.Unmarshal(chapterXMLReader, &chapterXML)
+	fmt.Println(chapterXML)
+	if err != nil {
+		return Chapter{}, err
 	}
 
-	displayName, ok := courseDisplayName.(string)
-	if !ok {
-		return Course{}, errors.New("Display name is not a string")
+	for _, sequential := range chapterXML.Sequentials {
+		fmt.Println(sequential)
+		// Parse (CoursePath + "/sequential/" + SequentialID + ".xml")
+		// parseSequential(sequential)
 	}
 
-	// Chapter extraction
-	chapters := make([]Chapter, 0)
-	chaptersGeneric, ok := courseInformationMap["chapter"]
-	if !ok {
-		return Course{}, err
-	}
-
-	// fmt.Println(chaptersGeneric)
-
-	chaptersArrGeneric, ok := chaptersGeneric.([]interface{})
-	if !ok {
-		// TODO: It is not necessary an array
-		return Course{}, errors.New("There are not enough")
-	}
-	// fmt.Println(chaptersArrGeneric)
-
-	for _, chapter := range chaptersArrGeneric {
-		chapterMap, ok := chapter.(map[string]interface{})
-		if !ok {
-			return Course{}, errors.New("One chapter is not a map")
-		}
-		chapterID := chapterMap["-url_name"].(string)
-		chapters = append(chapters, Chapter{
-			ID: chapterID,
-		})
-	}
-
-	course := Course{
-		DisplayName: displayName,
-		Chapters:    chapters,
-	}
-	return course, nil
+	return Chapter{}, nil
 }
