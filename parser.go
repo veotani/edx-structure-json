@@ -53,8 +53,37 @@ func parseCourseRoot() (Course, error) {
 	if !ok {
 		return Course{}, errors.New("Display name is not a string")
 	}
+
+	// Chapter extraction
+	chapters := make([]Chapter, 0)
+	chaptersGeneric, ok := courseInformationMap["chapter"]
+	if !ok {
+		return Course{}, err
+	}
+
+	// fmt.Println(chaptersGeneric)
+
+	chaptersArrGeneric, ok := chaptersGeneric.([]interface{})
+	if !ok {
+		// TODO: It is not necessary an array
+		return Course{}, errors.New("There are not enough")
+	}
+	// fmt.Println(chaptersArrGeneric)
+
+	for _, chapter := range chaptersArrGeneric {
+		chapterMap, ok := chapter.(map[string]interface{})
+		if !ok {
+			return Course{}, errors.New("One chapter is not a map")
+		}
+		chapterID := chapterMap["-url_name"].(string)
+		chapters = append(chapters, Chapter{
+			ID: chapterID,
+		})
+	}
+
 	course := Course{
 		DisplayName: displayName,
+		Chapters:    chapters,
 	}
 	return course, nil
 }
