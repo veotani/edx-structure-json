@@ -2,7 +2,6 @@ package parser
 
 import (
 	"encoding/xml"
-	"fmt"
 	"io/ioutil"
 )
 
@@ -27,14 +26,12 @@ func parseCourseRoot() (Course, error) {
 			return Course{}, err
 		}
 
-		fmt.Println(chapter)
-		// for _, sequential := range chapter.Sequentials {
-		// 	err = parseByStructure(&sequential, CoursePath+"/sequential/"+sequential.URLName+".xml")
-		// 	if err != nil {
-		// 		return Course{}, err
-		// 	}
-
-		// }
+		for sequentialNum, sequential := range chapter.Sequentials {
+			err = parseByStructure(&course.Chapters[chapterNum].Sequentials[sequentialNum], CoursePath+"/sequential/"+sequential.URLName+".xml")
+			if err != nil {
+				return Course{}, err
+			}
+		}
 	}
 
 	return *course, err
