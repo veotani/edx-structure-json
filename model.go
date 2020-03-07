@@ -14,38 +14,28 @@ type Chapter struct {
 }
 
 // Sequential is a description of CoursePath + "/sequential/" + SequentialID + ".xml" XML file
+// type Sequential struct {
+// 	URLName string `xml:"url_name,attr"`
+// 	// TODO: add CoursePath + "/sequential/" + SequentialID + ".xml" file structure
+// }
+
+// Sequential is a description of CoursePath + "/sequential/" + SequentialID + ".xml" XML file
 type Sequential struct {
-	URLName string `xml:"url_name,attr"`
-	// TODO: add CoursePath + "/sequential/" + SequentialID + ".xml" file structure
+	DisplayName string     `xml:"display_name,attr"`
+	URLName     string     `xml:"url_name,attr"`
+	Verticals   []Vertical `xml:"vertical"`
 }
 
-// type Course struct {
-// 	DisplayName string
-// 	ID          string
-// 	Chapters    []Chapter
-// }
-
-// type Chapter struct {
-// 	DisplayName string
-// 	ID          string
-// 	Sequentials []Sequential
-// }
-
-// type Sequential struct {
-// 	DisplayName string
-// 	ID          string
-// 	Verticals   []Vertical
-// }
-
-// type Vertical struct {
-// 	DisplayName     string
-// 	ID              string
-// 	Problems        []Problem
-// 	Discussions     []Discussion
-// 	Htmls           []Html
-// 	OpenAssessments []OpenAssessment
-// 	LibraryContents []LibraryContent
-// }
+// Vertical is a description of CoursePath + "/vertical/" + VerticalID + ".xml" XML file
+type Vertical struct {
+	//  DisplayName     string
+	URLName string `xml:"url_name,attr"`
+	// 	Problems        []Problem
+	// 	Discussions     []Discussion
+	// 	Htmls           []Html
+	// 	OpenAssessments []OpenAssessment
+	// 	LibraryContents []LibraryContent
+}
 
 // type LibraryContent struct {
 // 	DisplayName string
