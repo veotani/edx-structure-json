@@ -28,42 +28,42 @@ type Sequential struct {
 
 // Vertical is a description of CoursePath + "/vertical/" + VerticalID + ".xml" XML file
 type Vertical struct {
-	//  DisplayName     string
-	URLName string `xml:"url_name,attr"`
-	// 	Problems        []Problem
-	// 	Discussions     []Discussion
-	// 	Htmls           []Html
-	// 	OpenAssessments []OpenAssessment
-	// 	LibraryContents []LibraryContent
+	DisplayName     string           `xml:"display_name,attr"`
+	URLName         string           `xml:"url_name,attr"`
+	Problems        []Problem        `xml:"problem"`
+	Discussions     []Discussion     `xml:"discussion"`
+	Htmls           []Html           `xml:"html"`
+	OpenAssessments []OpenAssessment `xml:"open_assessment"`
+	LibraryContents []LibraryContent `xml:"library_content"`
 }
 
-// type LibraryContent struct {
-// 	DisplayName string
-// 	ID          string
-// 	Problems    []Problem
-// }
+type LibraryContent struct {
+	// 	DisplayName string
+	URLName string `xml:"url_name,attr"`
+	// 	// Problems    []Problem
+}
 
-// type OpenAssessment struct {
-// 	DisplayName string
-// 	ID          string
-// }
+type OpenAssessment struct {
+	// DisplayName string
+	URLName string `xml:"url_name,attr"`
+}
 
-// type Html struct {
-// 	DisplayName string
-// 	ID          string
-// }
+type Html struct {
+	// DisplayName string
+	URLName string `xml:"url_name,attr"`
+}
 
-// type Video struct {
-// 	DisplayName string
-// 	ID          string
-// }
+type Video struct {
+	// 	DisplayName string
+	URLName string `xml:"url_name,attr"`
+}
 
-// type Discussion struct {
-// 	ID          string
-// 	DisplayName string
-// }
+type Discussion struct {
+	URLName string `xml:"url_name,attr"`
+	// 	DisplayName string
+}
 
-// type Problem struct {
-// 	ID          string
-// 	DisplayName string
-// }
+type Problem struct {
+	URLName string `xml:"url_name,attr"`
+	// 	DisplayName string
+}
