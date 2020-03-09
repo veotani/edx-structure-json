@@ -31,6 +31,50 @@ func parseCourseRoot() (Course, error) {
 			if err != nil {
 				return Course{}, err
 			}
+
+			for verticalNum, vertical := range sequential.Verticals {
+				err = parseByStructure(&course.Chapters[chapterNum].Sequentials[sequentialNum].Verticals[verticalNum], CoursePath+"/vertical/"+vertical.URLName+".xml")
+				if err != nil {
+					return Course{}, err
+				}
+
+				for htmlNum, html := range vertical.Htmls {
+					err = parseByStructure(&course.Chapters[chapterNum].Sequentials[sequentialNum].Verticals[verticalNum].Htmls[htmlNum], CoursePath+"/html/"+html.URLName+".xml")
+					if err != nil {
+						return Course{}, err
+					}
+				}
+
+				for problemNum, problem := range vertical.Problems {
+					err = parseByStructure(&course.Chapters[chapterNum].Sequentials[sequentialNum].Verticals[verticalNum].Problems[problemNum], CoursePath+"/problem/"+problem.URLName+".xml")
+					if err != nil {
+						return Course{}, err
+					}
+				}
+
+				for videoNum, video := range vertical.Videos {
+					videoHelper := VideoHelper{}
+					err = parseByStructure(&videoHelper, CoursePath+"/video/"+video.URLName+".xml")
+					if err != nil {
+						return Course{}, err
+					}
+					course.Chapters[chapterNum].Sequentials[sequentialNum].Verticals[verticalNum].Videos[videoNum] = videoHelper.ToVideo()
+				}
+
+				for libraryContentNum, libraryContent := range vertical.LibraryContents {
+					err = parseByStructure(&course.Chapters[chapterNum].Sequentials[sequentialNum].Verticals[verticalNum].LibraryContents[libraryContentNum], CoursePath+"/library_content/"+libraryContent.URLName+".xml")
+					if err != nil {
+						return Course{}, err
+					}
+
+					for problemNum, problem := range libraryContent.Problems {
+						err = parseByStructure(&course.Chapters[chapterNum].Sequentials[sequentialNum].Verticals[verticalNum].LibraryContents[libraryContentNum].Problems[problemNum], CoursePath+"/problem/"+problem.URLName+".xml")
+						if err != nil {
+							return Course{}, err
+						}
+					}
+				}
+			}
 		}
 	}
 
