@@ -1,17 +1,85 @@
 package parser
 
 import (
+	"archive/tar"
+	"compress/gzip"
 	"encoding/xml"
+	"io"
 	"io/ioutil"
+	"log"
+	"os"
+	"strings"
 )
 
 // CoursePath is a path to folder with course structure in XML format
 const CoursePath string = "course/"
 
 // ParseCourse parses course structure recursively from root to leaves
-func ParseCourse() (Course, error) {
+func ParseCourse(courseStructurePath string) (Course, error) {
+	err := decompressCourseStructure(courseStructurePath)
+	if err != nil {
+		return Course{}, err
+	}
 	course, err := parseCourseRoot()
 	return course, err
+}
+
+func decompressCourseStructure(courseStructurePath string) error {
+	f, err := os.Open(courseStructurePath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	gzf, err := gzip.NewReader(f)
+	if err != nil {
+		return err
+	}
+
+	tarReader := tar.NewReader(gzf)
+
+	for {
+		header, err := tarReader.Next()
+
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			return err
+		}
+
+		name := header.Name
+
+		nameSplitByDot := strings.Split(name, ".")
+		extension := nameSplitByDot[len(nameSplitByDot)-1]
+
+		switch header.Typeflag {
+		case tar.TypeDir:
+			os.MkdirAll(name, 0777)
+		case tar.TypeReg:
+			if extension == "xml" {
+				newFile, err := os.Create(name)
+				if err != nil {
+					log.Printf("Unable to create file %v\n", name)
+					return err
+				}
+				_, err = io.Copy(newFile, tarReader)
+				if err != nil {
+					log.Printf("Unable to rewrite file %v\n", name)
+					return err
+				}
+			}
+		default:
+			log.Printf("%s : %c %s %s\n",
+				"Yikes! Unable to figure out type",
+				header.Typeflag,
+				"in file",
+				name,
+			)
+		}
+	}
+	return nil
 }
 
 func parseCourseRoot() (Course, error) {
