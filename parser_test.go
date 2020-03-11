@@ -4,6 +4,7 @@ package parser
 //
 
 import (
+	"os"
 	"strconv"
 	"testing"
 )
@@ -24,7 +25,7 @@ import (
 // }
 
 func TestParseProblem(t *testing.T) {
-	course, err := ParseCourse("course.aZ_uVd.tar.gz")
+	course, err := ParseCourse("course.2KCrwb.tar.gz")
 	if err != nil {
 		t.Errorf("%v", err)
 	}
@@ -46,6 +47,27 @@ func TestParseProblem(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestNoDirectoryAfterParserRun(t *testing.T) {
+	_, err := ParseCourse("course.2KCrwb.tar.gz")
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
+	if exists("course/") {
+		t.Error("Directory isn't cleaned after method run")
+	}
+}
+
+func exists(filePath string) (exists bool) {
+	exists = true
+
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		exists = false
+	}
+
+	return
 }
 
 func TestParseDiscussion(t *testing.T) {
