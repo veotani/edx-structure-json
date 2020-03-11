@@ -21,6 +21,10 @@ func ParseCourse(courseStructurePath string) (Course, error) {
 		return Course{}, err
 	}
 	course, err := parseCourseRoot()
+	if err != nil {
+		return Course{}, err
+	}
+	err = cleanCourseStructure()
 	return course, err
 }
 
@@ -78,6 +82,14 @@ func decompressCourseStructure(courseStructurePath string) error {
 				name,
 			)
 		}
+	}
+	return nil
+}
+
+func cleanCourseStructure() error {
+	err := os.RemoveAll("course/")
+	if err != nil {
+		return err
 	}
 	return nil
 }
