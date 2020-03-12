@@ -4,6 +4,7 @@ package parser
 //
 
 import (
+	"encoding/json"
 	"os"
 	"strconv"
 	"testing"
@@ -25,7 +26,7 @@ import (
 // }
 
 func TestParseProblem(t *testing.T) {
-	course, err := ParseCourse("course.2KCrwb.tar.gz")
+	course, err := ParseCourse("examples/course.yEitvN.tar.gz")
 	if err != nil {
 		t.Errorf("%v", err)
 	}
@@ -49,8 +50,56 @@ func TestParseProblem(t *testing.T) {
 	}
 }
 
+func TestMarshal(t *testing.T) {
+	course := Course{
+		DisplayName: "course",
+		Chapters: []Chapter{Chapter{
+			DisplayName: "chapter",
+			URLName:     "chapter_url",
+			Sequentials: []Sequential{Sequential{
+				DisplayName: "sequential",
+				URLName:     "sequential_url",
+				Verticals: []Vertical{Vertical{
+					DisplayName: "vertical",
+					Problems: []Problem{Problem{
+						DisplayName: "problem",
+					}},
+				}},
+			}},
+		}},
+	}
+
+	jsonBytes, err := json.Marshal(course)
+	if err != nil {
+		t.Error(err)
+	}
+
+	unmarshaledCourse := Course{}
+	json.Unmarshal(jsonBytes, &unmarshaledCourse)
+
+	if unmarshaledCourse.DisplayName != "course" {
+		t.Error("Root level data is invalid")
+	}
+
+	if unmarshaledCourse.Chapters[0].DisplayName != "chapter" {
+		t.Error("Chapter level data is invalid")
+	}
+
+	if unmarshaledCourse.Chapters[0].Sequentials[0].DisplayName != "sequential" {
+		t.Error("Sequential level data is invalid")
+	}
+
+	if unmarshaledCourse.Chapters[0].Sequentials[0].Verticals[0].DisplayName != "vertical" {
+		t.Error("Vertical level data is invalid")
+	}
+
+	if unmarshaledCourse.Chapters[0].Sequentials[0].Verticals[0].Problems[0].DisplayName != "problem" {
+		t.Error("Problem level data is invalid")
+	}
+}
+
 func TestNoDirectoryAfterParserRun(t *testing.T) {
-	_, err := ParseCourse("course.2KCrwb.tar.gz")
+	_, err := ParseCourse("examples/course.yEitvN.tar.gz")
 	if err != nil {
 		t.Errorf("%v", err)
 	}
