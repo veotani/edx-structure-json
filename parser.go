@@ -95,38 +95,53 @@ func cleanCourseStructure() error {
 }
 
 func parseCourseRoot() (Course, error) {
-	course := &Course{}
-	err := parseByStructure(course, CoursePath+"/course/course.xml")
+	course := Course{}
+	err := parseByStructure(&course, CoursePath+"/course/course.xml")
 	if err != nil {
 		return Course{}, err
 	}
-	for chapterNum, chapter := range course.Chapters {
-		err = parseByStructure(&course.Chapters[chapterNum], CoursePath+"/chapter/"+chapter.URLName+".xml")
+	for chapterNum := range course.Chapters {
+		chapter := Chapter{}
+		err = parseByStructure(&chapter, CoursePath+"/chapter/"+course.Chapters[chapterNum].URLName+".xml")
+		chapter.URLName = course.Chapters[chapterNum].URLName
+		course.Chapters[chapterNum] = chapter
 		if err != nil {
 			return Course{}, err
 		}
 
-		for sequentialNum, sequential := range chapter.Sequentials {
-			err = parseByStructure(&course.Chapters[chapterNum].Sequentials[sequentialNum], CoursePath+"/sequential/"+sequential.URLName+".xml")
+		for sequentialNum := range chapter.Sequentials {
+			sequential := Sequential{}
+			err = parseByStructure(&sequential, CoursePath+"/sequential/"+chapter.Sequentials[sequentialNum].URLName+".xml")
+			sequential.URLName = chapter.Sequentials[sequentialNum].URLName
+			course.Chapters[chapterNum].Sequentials[sequentialNum] = sequential
 			if err != nil {
 				return Course{}, err
 			}
 
-			for verticalNum, vertical := range sequential.Verticals {
-				err = parseByStructure(&course.Chapters[chapterNum].Sequentials[sequentialNum].Verticals[verticalNum], CoursePath+"/vertical/"+vertical.URLName+".xml")
+			for verticalNum := range sequential.Verticals {
+				vertical := Vertical{}
+				err = parseByStructure(&vertical, CoursePath+"/vertical/"+sequential.Verticals[verticalNum].URLName+".xml")
+				vertical.URLName = sequential.Verticals[verticalNum].URLName
+				course.Chapters[chapterNum].Sequentials[sequentialNum].Verticals[verticalNum] = vertical
 				if err != nil {
 					return Course{}, err
 				}
 
-				for htmlNum, html := range vertical.Htmls {
-					err = parseByStructure(&course.Chapters[chapterNum].Sequentials[sequentialNum].Verticals[verticalNum].Htmls[htmlNum], CoursePath+"/html/"+html.URLName+".xml")
+				for htmlNum := range vertical.Htmls {
+					html := Html{}
+					err = parseByStructure(&html, CoursePath+"/html/"+vertical.Htmls[htmlNum].URLName+".xml")
+					html.URLName = vertical.Htmls[htmlNum].URLName
+					course.Chapters[chapterNum].Sequentials[sequentialNum].Verticals[verticalNum].Htmls[htmlNum] = html
 					if err != nil {
 						return Course{}, err
 					}
 				}
 
-				for problemNum, problem := range vertical.Problems {
-					err = parseByStructure(&course.Chapters[chapterNum].Sequentials[sequentialNum].Verticals[verticalNum].Problems[problemNum], CoursePath+"/problem/"+problem.URLName+".xml")
+				for problemNum := range vertical.Problems {
+					problem := Problem{}
+					err = parseByStructure(&problem, CoursePath+"/problem/"+vertical.Problems[problemNum].URLName+".xml")
+					problem.URLName = vertical.Problems[problemNum].URLName
+					course.Chapters[chapterNum].Sequentials[sequentialNum].Verticals[verticalNum].Problems[problemNum] = problem
 					if err != nil {
 						return Course{}, err
 					}
@@ -141,14 +156,20 @@ func parseCourseRoot() (Course, error) {
 					course.Chapters[chapterNum].Sequentials[sequentialNum].Verticals[verticalNum].Videos[videoNum] = videoHelper.ToVideo()
 				}
 
-				for libraryContentNum, libraryContent := range vertical.LibraryContents {
-					err = parseByStructure(&course.Chapters[chapterNum].Sequentials[sequentialNum].Verticals[verticalNum].LibraryContents[libraryContentNum], CoursePath+"/library_content/"+libraryContent.URLName+".xml")
+				for libraryContentNum := range vertical.LibraryContents {
+					libraryContent := LibraryContent{}
+					err = parseByStructure(&libraryContent, CoursePath+"/library_content/"+vertical.LibraryContents[libraryContentNum].URLName+".xml")
+					libraryContent.URLName = vertical.LibraryContents[libraryContentNum].URLName
+					course.Chapters[chapterNum].Sequentials[sequentialNum].Verticals[verticalNum].LibraryContents[libraryContentNum] = libraryContent
 					if err != nil {
 						return Course{}, err
 					}
 
-					for problemNum, problem := range libraryContent.Problems {
-						err = parseByStructure(&course.Chapters[chapterNum].Sequentials[sequentialNum].Verticals[verticalNum].LibraryContents[libraryContentNum].Problems[problemNum], CoursePath+"/problem/"+problem.URLName+".xml")
+					for problemNum := range libraryContent.Problems {
+						problem := Problem{}
+						err = parseByStructure(&problem, CoursePath+"/problem/"+libraryContent.Problems[problemNum].URLName+".xml")
+						problem.URLName = libraryContent.Problems[problemNum].URLName
+						course.Chapters[chapterNum].Sequentials[sequentialNum].Verticals[verticalNum].LibraryContents[libraryContentNum].Problems[problemNum] = problem
 						if err != nil {
 							return Course{}, err
 						}
@@ -157,8 +178,7 @@ func parseCourseRoot() (Course, error) {
 			}
 		}
 	}
-
-	return *course, err
+	return course, err
 }
 
 func parseByStructure(structureObject interface{}, filePath string) error {

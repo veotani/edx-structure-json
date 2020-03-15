@@ -73,8 +73,7 @@ type Video struct {
 
 // Discussion is a forum discussion.
 type Discussion struct {
-	URLName     string `xml:"url_name,attr" json:"url_name"`
-	DisplayName string `xml:"display_name,attr" json:"display_name"`
+	URLName string `xml:"url_name,attr" json:"url_name"`
 }
 
 // Problem have difficult structure within it, so only name and

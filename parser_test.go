@@ -11,7 +11,7 @@ import (
 )
 
 // func TestParseStructure(t *testing.T) {
-// 	course, err := ParseCourse("course.aZ_uVd.tar.gz")
+// 	course, err := ParseCourse("course.UbARR0.tar.gz")
 // 	if err != nil {
 // 		t.Log(err)
 // 	}
@@ -26,7 +26,7 @@ import (
 // }
 
 func TestParseProblem(t *testing.T) {
-	course, err := ParseCourse("examples/course.yEitvN.tar.gz")
+	course, err := ParseCourse("course.UbARR0.tar.gz")
 	if err != nil {
 		t.Errorf("%v", err)
 	}
@@ -99,7 +99,7 @@ func TestMarshal(t *testing.T) {
 }
 
 func TestNoDirectoryAfterParserRun(t *testing.T) {
-	_, err := ParseCourse("examples/course.yEitvN.tar.gz")
+	_, err := ParseCourse("course.UbARR0.tar.gz")
 	if err != nil {
 		t.Errorf("%v", err)
 	}
@@ -120,7 +120,7 @@ func exists(filePath string) (exists bool) {
 }
 
 func TestParseDiscussion(t *testing.T) {
-	course, err := ParseCourse("course.aZ_uVd.tar.gz")
+	course, err := ParseCourse("course.UbARR0.tar.gz")
 	if err != nil {
 		t.Errorf("%v", err)
 	}
@@ -129,14 +129,9 @@ func TestParseDiscussion(t *testing.T) {
 		for _, sequential := range chapter.Sequentials {
 			for _, vertical := range sequential.Verticals {
 				for _, discussion := range vertical.Discussions {
-					// All discussions have name with length > 0 (edX restriction)
-					if len(discussion.DisplayName) == 0 {
-						t.Fail()
-					}
-
 					// All discussions have id with length > 0 (edX restriction)
 					if len(discussion.URLName) == 0 {
-						t.Fail()
+						t.Error("wrong discussion url name")
 					}
 				}
 			}
@@ -145,7 +140,7 @@ func TestParseDiscussion(t *testing.T) {
 }
 
 func TestParseHtml(t *testing.T) {
-	course, err := ParseCourse("course.aZ_uVd.tar.gz")
+	course, err := ParseCourse("course.UbARR0.tar.gz")
 	if err != nil {
 		t.Errorf("%v", err)
 	}
@@ -154,14 +149,9 @@ func TestParseHtml(t *testing.T) {
 		for _, sequential := range chapter.Sequentials {
 			for _, vertical := range sequential.Verticals {
 				for _, html := range vertical.Htmls {
-					// All htmls have name with length > 0 (edX restriction)
-					if len(html.DisplayName) == 0 {
-						t.Fail()
-					}
-
 					// All htmls have id with length > 0 (edX restriction)
 					if len(html.URLName) == 0 {
-						t.Fail()
+						t.Error("html has incorrect url name")
 					}
 				}
 			}
@@ -170,7 +160,7 @@ func TestParseHtml(t *testing.T) {
 }
 
 func TestParseOpenAssessment(t *testing.T) {
-	course, err := ParseCourse("course.aZ_uVd.tar.gz")
+	course, err := ParseCourse("course.UbARR0.tar.gz")
 	if err != nil {
 		t.Errorf("%v", err)
 	}
@@ -190,7 +180,7 @@ func TestParseOpenAssessment(t *testing.T) {
 }
 
 func TestParseVideo(t *testing.T) {
-	course, err := ParseCourse("course.aZ_uVd.tar.gz")
+	course, err := ParseCourse("course.UbARR0.tar.gz")
 	if err != nil {
 		t.Errorf("%v", err)
 	}
