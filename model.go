@@ -14,6 +14,8 @@ package parser
 type Course struct {
 	DisplayName string    `xml:"display_name,attr" json:"display_name"`
 	Chapters    []Chapter `xml:"chapter" json:"chapters"`
+	CourseCode  string    `json:"course_code"`
+	CourseRun   string    `json:"course_run"`
 }
 
 // Chapter is a description of CoursePath + "/chapter/" + ChapterID + ".xml" XML file

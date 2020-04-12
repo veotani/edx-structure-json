@@ -22,6 +22,16 @@ type VideoAsset struct {
 	Duration string `xml:"duration,attr"`
 }
 
+// CourseHelper used to help marshalling and parsing wiki
+type CourseHelper struct {
+	CourseWiki CourseWiki `xml:"wiki"`
+}
+
+// CourseWiki is a code and run of the course. It's used to connect with the log file
+type CourseWiki struct {
+	Slug string `xml:"slug,attr"`
+}
+
 // ToVideo converts VideoHelper to Video object.
 // There is only 1 video asset and we haven't met any cases where there
 // are more. If this situation happends, then this method should be rewritten

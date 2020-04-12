@@ -4,6 +4,7 @@ import (
 	"archive/tar"
 	"compress/gzip"
 	"encoding/xml"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -100,6 +101,20 @@ func parseCourseRoot() (Course, error) {
 	if err != nil {
 		return Course{}, err
 	}
+	// Get code
+	courseHelper := &CourseHelper{}
+	err = parseByStructure(courseHelper, CoursePath+"/course/course.xml")
+	if err != nil {
+		return Course{}, err
+	}
+	courseSlug := courseHelper.CourseWiki.Slug
+	if len(courseSlug) < 3 {
+		return Course{}, fmt.Errorf("Course wiki format is invalid. Please check that course/course.xml files has wiki object with slug field which has following format: \"organization.CourseCode.CourseRun\", meanwhile slug field is equal to: %v", courseHelper.CourseWiki)
+	}
+	courseCode := strings.Split(courseSlug, ".")[1]
+	courseRun := strings.Split(courseSlug, ".")[2]
+	course.CourseCode = courseCode
+	course.CourseRun = courseRun
 	for chapterNum := range course.Chapters {
 		chapter := Chapter{}
 		err = parseByStructure(&chapter, CoursePath+"/chapter/"+course.Chapters[chapterNum].URLName+".xml")
